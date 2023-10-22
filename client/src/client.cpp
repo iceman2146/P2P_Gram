@@ -18,18 +18,33 @@ typedef boost::shared_ptr<tcp::socket> socket_ptr;
 typedef boost::shared_ptr<string> string_ptr;
 typedef boost::shared_ptr< queue<string_ptr> > messageQueue_ptr;
 
-io_service service;
-messageQueue_ptr messageQueue(new queue<string_ptr>);
-tcp::endpoint ep(ip::address::from_string("127.0.0.1"), 8001);
-const int inputSize = 256;
-string_ptr promptCpy;
+io_service service; // Boost Asio io_service
+messageQueue_ptr messageQueue(new queue<string_ptr>); // Queue for producer consumer pattern
+tcp::endpoint ep(ip::address::from_string("127.0.0.1"), 8001); // TCP socket for connecting to server
+const int inputSize = 256; // Maximum size for input buffer
+string_ptr promptCpy; // Terminal prompt displayed to chat users
 
 // Function Prototypes
 bool isOwnMessage(string_ptr);
-void displayLoop(socket_ptr);
-void inboundLoop(socket_ptr, string_ptr);
-void writeLoop(socket_ptr, string_ptr);
-string* buildPrompt();
+
+void displayLoop(socket_ptr);//”дал€ет элементы данных из messageQueue дл€ отображени€ в клиентском терминале; т.е. потребитель
+
+void inboundLoop(socket_ptr, string_ptr);	//Ѕудет отправл€ть элементы из сокета в нашу messageQueue; т.е. производитель
+											//создает цикл, который вставл€етс€ в поток только тогда, когда сообщение 
+											//доступно в сокете, подключенном к серверу. „тение из объекта сокета Ч это операци€, 
+											//котора€ потенциально может помешать записи в сокет, поэтому мы устанавливаем задержку
+											// в одну секунду дл€ проверок на чтение.
+
+void writeLoop(socket_ptr, string_ptr);	//записи mesasges в сокет дл€ отправки другим участникам сеанса чата, нам нужен цикл, который 
+										//будет посто€нно опрашивать пользовательский ввод. ѕосле того, как пользовательский ввод будет
+										//прочитан, запишите сообщение в сокет и дождитесь следующего ввода. ¬спомните, что эта операци€ 
+										//€вл€етс€ многопоточной, поэтому вход€щие сообщени€ все еще могут отображатьс€, поскольку это 
+										//происходит в совершенно другом потоке.
+
+string* buildPrompt();	// обрабатывает отображение входных данных терминала дл€ клиентов.
+						//принимает строку имени клиента и присваивает
+						//ее значению указател€ приглашени€, который мы объ€вили ранее.
+
 // End of Function Prototypes
 
 int main(int argc, char** argv)
@@ -65,7 +80,6 @@ int main(int argc, char** argv)
 string* buildPrompt()
 {
 	const int inputSize = 256;
-	char inputBuf[inputSize] = {0};
 	char nameBuf[inputSize] = {0};
 	string* prompt = new string(": ");
 

@@ -4,6 +4,7 @@ find_package(Boost COMPONENTS system thread chrono REQUIRED)
 find_package(Threads REQUIRED)
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
+
 include(CTest)
 enable_testing()
 

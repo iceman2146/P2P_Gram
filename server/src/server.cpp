@@ -35,9 +35,11 @@ enum sleepLen // Time is in milliseconds
 // Function Prototypes
 bool clientSentExit(string_ptr);
 void disconnectClient(socket_ptr);
-void acceptorLoop();
-void requestLoop();
-void responseLoop();
+void acceptorLoop();//ќбработка новых клиентских TCP/IP-соединений
+void requestLoop();//ќбрабатывает клиентские запросы, добавл€€ их в MessageQueue(producer)
+
+
+void responseLoop();//ќбрабатывает ответы сервера клиентам, считывает из MessageQueue(consumer)
 // End of Function Prototypes
 
 int main(int argc, char** argv)
